@@ -24,7 +24,7 @@ export default {
             this.$store.dispatch("setThemes", response.data)
           }
         }).catch(error => {
-          console.log(error )
+          console.log(error)
     })
   }
 }

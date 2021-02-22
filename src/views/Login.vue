@@ -16,7 +16,7 @@
                         @click:append="showPassword = !showPassword"
                         @keypress.enter="login"/>
           <p class="ml-2 isError" v-if="error">{{ error }}</p>
-          <v-btn color="primary" class="ml-1 mb-3" :disabled="canLogin" @click="login">Se connecter</v-btn>
+          <v-btn color="primary" class="ml-1 mb-3" :disabled="!canLogin" @click="login">Se connecter</v-btn>
           <p>Pas encore inscrit ? Enregistrez vous <router-link to="/about">ici</router-link></p>
         </v-card-text>
       </v-card>
@@ -40,6 +40,8 @@ export default {
   }),
   methods:{
     login: function () {
+      if(!this.canLogin)
+        return;
       this.error = '';
       const { username, password } = this;
       this.$store.dispatch('authRequest', { username, password }).then((response) => {
@@ -64,7 +66,7 @@ export default {
   computed:{
     ...mapGetters(['authStatus']),
     canLogin(){
-      return !this.username || !this.password || this.authStatus === 'loading';
+      return this.username && this.password && this.authStatus !== 'loading';
     }
   }
 };

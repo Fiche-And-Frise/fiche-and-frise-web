@@ -1,10 +1,20 @@
 <template>
   <div>
-    <v-btn color="secondary" class="mb-5" @click="toggleModal">Ajouter une fiche</v-btn>
+    <v-btn color="secondary" class="mb-5" @click="toggleNew">Ajouter une fiche</v-btn>
     <v-row>
-      <v-col :class="nbCols" v-for="(fiche, index) in allFiches" :key="index"><Fiche :fiche="fiche"/></v-col>
+      <v-col :class="nbCols" v-for="(fiche, index) in allFiches" :key="index">
+        <v-btn block @click="toggleFiche(fiche)">{{ fiche.name }}</v-btn>
+      </v-col>
     </v-row>
-    <Modale :reveal="reveal" :toggle-modale="toggleModal"/>
+    <transition name="fade">
+      <NewFicheModale :update-view="updateView" :revealNew="revealNew" :toggle-new="toggleNew" :allThemes="allThemes"/>
+    </transition>
+    <transition name="fade">
+      <FicheModale :fiche="selectedFiche"
+                   :revealFiche="revealFiche"
+                   :toggle-fiche="toggleFiche"
+                   :update-view="updateView"/>
+    </transition>
   </div>
 </template>
 
@@ -12,23 +22,27 @@
 import axios from "axios";
 axios.defaults.withCredentials = true
 //import chunk from "chunk"
-import Fiche from "@/components/Fiche";
-import Modale from "@/components/Modale";
-
+import NewFicheModale from "@/components/NewFicheModale";
+import FicheModale from "@/components/FicheModale";
+import {mapGetters} from 'vuex'
 export default {
   name: "Fiches",
   components: {
-    Fiche,
-    Modale
+    NewFicheModale,
+    FicheModale
   },
   data: () => {
     return {
       allFiches: [],
       screenWidth: screen.width,
-      reveal: false
+      revealNew: false,
+      revealFiche: false,
+      selectedFiche: null,
+      allThemes: []
     }
   },
   computed: {
+    ...mapGetters(["getThemes"]),
     totalFiches(){
       return this.allFiches.length
     },
@@ -41,19 +55,45 @@ export default {
         return 'col-6'
       return 'col-12'
     },
-    /*chunkFiches(){
-      return chunk(this.allFiches, this.nbCols)
-    }*/
   },
   methods: {
-    toggleModal(){
-      this.reveal = !this.reveal;
+    toggleNew(){
+      this.revealNew = !this.revealNew;
+    },
+    toggleFiche(fiche){
+      this.selectedFiche = fiche;
+      this.revealFiche = !this.revealFiche;
+    },
+    updateView(){
+      axios.get("http://localhost:8081/fiches")
+          .then(response => {
+            if(response.data){
+              this.allFiches = response.data
+            }
+            console.log(response)
+          }).catch(error => {
+        console.log("Error : " + error);
+      });
     }
   },
+  beforeCreate() {
+    this.$store.dispatch("getAllThemes")
+        .then(response => {
+          if(response && response.data){
+            console.log("Récupération des thèmes")
+            console.log(response)
+            this.allThemes = response.data;
+            console.log(this.allThemes);
+          }
+        }).catch(error => {
+      console.log(error)
+    })
+  },
   mounted() {
+    this.$store.dispatch("getAllThemes").then(response => this.allThemes = response.data)
     window.addEventListener("resize", ()=> {
       this.screenWidth = window.innerWidth;
-      })
+      });
     axios.get("http://localhost:8081/fiches")
         .then(response => {
           if(response.data){
@@ -62,11 +102,32 @@ export default {
           console.log(response)
         }).catch(error => {
           console.log("Error : " + error);
-    })
+    });
+  },
+  watch:{
+    revealNew: function (){
+      if(this.revealNew){
+        document.documentElement.style.overflow = 'hidden'
+        return
+      }
+      document.documentElement.style.overflow = 'auto'
+    },
+    revealFiche: function (){
+      if(this.revealFiche){
+        document.documentElement.style.overflow = 'hidden'
+        return
+      }
+      document.documentElement.style.overflow = 'auto'
+    }
   }
 }
 </script>
 
 <style scoped>
-
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .5s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
+}
 </style>

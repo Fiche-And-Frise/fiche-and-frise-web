@@ -1,19 +1,11 @@
 <template>
   <div class="flipper">
-    <v-card class="fixedHeight front">
-        <v-card-title @click="toggleCard">{{ fiche.name }}</v-card-title>
-        <v-card-text @click="toggleCard">{{ flipped ? fiche.verso : fiche.recto }}</v-card-text>
-        <v-divider/>
-        <v-card-actions><v-btn class="ma-2 primary">Modifier</v-btn><v-btn class="ma-2 error" @click="deleteFiche">Supprimer</v-btn></v-card-actions>
-    </v-card>
+
   </div>
 </template>
 
 <script>
-import Vue from 'vue'
-import { createSimpleTransition } from 'vuetify/lib/components/transitions/createTransition'
-const flipTransition = createSimpleTransition('flip-transition')
-Vue.component('flip', flipTransition)
+
 export default {
   name: "Fiche",
   props: {
@@ -39,5 +31,12 @@ export default {
 .fixedHeight{
   height: fit-content;
 }
-
+.modale{
+  background: #f1f1f1;
+  color: #333;
+  position: fixed;
+  width: 50%;
+  top: 10%;
+  bottom: 10%;
+}
 </style>
