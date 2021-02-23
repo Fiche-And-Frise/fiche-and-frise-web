@@ -15,7 +15,7 @@
             <v-list-item-icon>
               <v-icon>mdi-logout</v-icon>
             </v-list-item-icon>
-            <v-list-item-content><v-btn text @click="logout"></v-btn></v-list-item-content>
+            <v-list-item-content><v-btn text @click="logout">Déconnexion</v-btn></v-list-item-content>
           </v-list-item>
         </v-list>
       </v-navigation-drawer>

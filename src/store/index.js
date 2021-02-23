@@ -8,30 +8,48 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     user: localStorage.getItem('username') || '',
+    timestamp: parseInt(localStorage.getItem('timestamp')) || '',
     status: '',
     themes: []
   },
   getters:{
-    isAuthenticated: state => !!state.user,
+    isAuthenticated: state => {
+      const isExpired = new Date().getTime() > state.timestamp;
+      console.log(!!state.user + " et " + !isExpired)
+      return !!state.user && !isExpired;
+    },
     authStatus: state => state.status,
     getThemes: state => state.themes
   },
   mutations: {
     SET_USER(state, user){
       state.user = user;
+      let date = new Date();
+      console.log(date);
+      date.setMinutes(date.getMinutes()+15);
+      console.log(date);
+      state.timestamp = date;
     },
     AUTH_REQUEST(state) {
       state.status = 'loading'
     },
     AUTH_SUCCESS(state, username){
+      let date = new Date();
+      date.setHours(date.getHours()+2);
+      localStorage.setItem("timestamp", date.getTime().toString());
+      localStorage.setItem('username', username)
       state.status = 'success'
       state.user = username
+      state.timestamp = date.getTime().toString();
     },
     AUTH_ERROR(state){
-      state.status = 'error'
+      state.status = 'error';
+      localStorage.removeItem('username')
+      localStorage.removeItem('timestamp')
     },
     AUTH_LOGOUT(state){
       state.user = '';
+      state.timestamp = '';
       state.status = 'success'
     },
     SET_THEMES(state, themesList){
@@ -59,7 +77,6 @@ export default new Vuex.Store({
         axios({url: 'http://localhost:8081/login', data: params, method: 'POST', config })
             .then(resp => {
               const username = resp.data.username
-              localStorage.setItem('username', username) // store the token in localstorage
               commit('AUTH_SUCCESS', username)
               // you have your token, now log in your user :)
               //dispatch('USER_REQUEST')
@@ -67,7 +84,6 @@ export default new Vuex.Store({
             })
             .catch(err => {
               commit('AUTH_ERROR', err)
-              localStorage.removeItem('username') // if the request fails, remove any possible user token if possible
               reject(err)
             })
       })
@@ -88,6 +104,27 @@ export default new Vuex.Store({
               resolve(resp)
             })
             .catch(err => {
+              reject(err)
+            })
+      })
+    },
+    registerRequest({username, password}){
+      const params = new URLSearchParams();
+      params.append('userName', username);
+      params.append('password', password);
+      const config = {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }
+      return new Promise((resolve, reject) => { // The Promise used for router redirect in login
+        axios({url: 'http://localhost:8081/registration', data: params, method: 'POST', config })
+            .then(resp => {
+              alert("Vous êtes bien inscrit !")
+              resolve(resp)
+            })
+            .catch(err => {
+              alert("Erreur lors de l'inscription :/")
               reject(err)
             })
       })

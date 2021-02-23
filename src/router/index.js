@@ -6,6 +6,7 @@ import Fiches from '../views/Fiches.vue'
 import Frises from '../views/Frises.vue'
 import Themes from '../views/Themes.vue'
 import store from '../store'
+import Register from "@/views/Register";
 
 Vue.use(VueRouter)
 
@@ -31,6 +32,12 @@ const routes = [
     path: '/login',
     name: 'Login',
     component: Login,
+    beforeEnter: ifNotAuthenticated
+  },
+  {
+    path: '/register',
+    name: 'Register',
+    component: Register,
     beforeEnter: ifNotAuthenticated
   },
   {
