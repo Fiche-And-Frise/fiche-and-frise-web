@@ -74,7 +74,7 @@ export default new Vuex.Store({
       }
       return new Promise((resolve, reject) => { // The Promise used for router redirect in login
         commit('AUTH_REQUEST')
-        axios({url: 'http://localhost:8081/login', data: params, method: 'POST', config })
+        axios({url: process.env.VUE_APP_API_URL + '/login', data: params, method: 'POST', config })
             .then(resp => {
               const username = resp.data.username
               commit('AUTH_SUCCESS', username)
@@ -97,7 +97,7 @@ export default new Vuex.Store({
     },
     getAllThemes({commit}){
       return new Promise((resolve, reject) => { // The Promise used for router redirect in login
-        axios({url: 'http://localhost:8081/themes', method: 'GET'})
+        axios({url: process.env.VUE_APP_API_URL + '/themes', method: 'GET'})
             .then(resp => {
               const themes = resp.data
               commit('SET_THEMES', themes)
@@ -118,7 +118,7 @@ export default new Vuex.Store({
         }
       }
       return new Promise((resolve, reject) => { // The Promise used for router redirect in login
-        axios({url: 'http://localhost:8081/registration', data: params, method: 'POST', config })
+        axios({url: process.env.VUE_APP_API_URL + '/registration', data: params, method: 'POST', config })
             .then(resp => {
               alert("Vous êtes bien inscrit !")
               resolve(resp)

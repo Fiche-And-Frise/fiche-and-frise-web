@@ -65,7 +65,7 @@ export default {
       this.revealFiche = !this.revealFiche;
     },
     updateView(){
-      axios.get("http://localhost:8081/fiches")
+      axios.get(process.env.VUE_APP_API_URL + "/fiches")
           .then(response => {
             if(response.data){
               this.allFiches = response.data
@@ -94,7 +94,7 @@ export default {
     window.addEventListener("resize", ()=> {
       this.screenWidth = window.innerWidth;
       });
-    axios.get("http://localhost:8081/fiches")
+    axios.get(process.env.VUE_APP_API_URL + "/fiches")
         .then(response => {
           if(response.data){
             this.allFiches = response.data

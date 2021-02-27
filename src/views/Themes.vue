@@ -24,7 +24,7 @@ export default {
     window.addEventListener("resize", ()=> {
       this.screenWidth = window.innerWidth;
     })
-    axios.get("http://localhost:8081/themes")
+    axios.get(process.env.VUE_APP_API_URL + "/themes")
         .then(response => {
           if(response.data){
             this.allThemes = response.data
